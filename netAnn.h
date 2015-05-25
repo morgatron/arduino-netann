@@ -76,6 +76,8 @@ public:
 	void scanUpdate();
 	void calibrate();
 	QuadratureSample calibrateSample(QuadratureSample q, float freq);
+    QuadratureSample sample();
+    void runContinuously();
 
 
 	void toggleDataSending();
@@ -198,7 +200,7 @@ private:
 	long sig90_long=0;
 	const int AI_ZERO=2047; //until we measure it more accurately.
 
-	unsigned int cur_N_SENS_WV=2;
+	unsigned int cur_N_SENS_WV=4;
 	unsigned int cur_N_SENS_WV2=2;
 	int nPointRepetitions=1;
 	int nPointRepetitions2=1;
@@ -206,8 +208,8 @@ private:
 	//int nPointRepetitionsWvFm2=1;
 	bool bRepeatPointsInWaveform;
 	int nCycles=1;
-	int nSampsPerCycle=4;
-	int nSampsPerCycle2=4;
+	int nSampsPerCycle=8;
+	int nSampsPerCycle2=2;
 	//Constants
 	//Keep them global for the time being
 	//Flags

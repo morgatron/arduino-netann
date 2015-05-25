@@ -18,9 +18,14 @@ extern SerialCommand sCmd;
 //--------------  SERIAL COMMUNICATIONS STUFF
 // Functions for talking to the computer
 /*Write the time, read values, and output value*/
-void sendData(float freq, float sig0, float sig90){
-	Serial.print("d: ");
-	Serial.print(freq);
+void sendFreqRespData(float freq, float sig0, float sig90){
+	sendData(freq, sig0, sig0, "freqResp");
+}
+void sendData(float x, float sig0, float sig90, char[] wvfm_name="raw_sig"){
+	char lhs_str[20]="d|"; 
+	strcat(lhs_str, wfm_name); strcat(lhs_str, ':');
+	Serial.print( lhs_str );
+	Serial.print(x);
 	Serial.print(" ");
 	Serial.print(sig0);
 	Serial.print(" ");
@@ -47,8 +52,6 @@ void cmdGetR(){
 	q=q.rotated(-freq*netAnn.calWriteReadLag*TWOPI);
 	float R=Serial.println(calcR(q.sig0, q.sig90, 50000, netAnn.getSensAmplitudeDig()));
 	PRINT_VAR(R);
-
-
 }
 
 void cmdSendDataOn(){

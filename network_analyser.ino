@@ -74,6 +74,22 @@ void loop() {
 	Serial.print(q.sig0); Serial.println(q.sig90);
 	Serial.println("caled:");
 	Serial.print(calQ.sig0); Serial.println(calQ.sig90);
+
+
+    // RUN CONTINUOUSLY:
+    if (0){
+        netAnn.runContinuously(); //set bSingleFreq
+        if(netAnn.bSampleReady){
+            int tNowMs=millis();
+            QuadratureSample samp=netAnn.sample(); // will unset bSampleReady
+            sendData(tNowMs, samp.sig0, samp.sig90);
+            //myPID.Input=calcR(...)
+            //myPID.update();
+            //netAnn.setSensAmpDig2(myPID.Output);
+            //netAnn.updateSensWvFm2();
+        }
+
+    }
 		//Serial.print("sig0NR: ");
 		//Serial.println(calcR(calQ.sig0, calQ.sig90, Rref, netAnn.getSensAmplitudeDig()));
 		//Serial.print(q.sig0); Serial.println(q.sig90);

@@ -10,7 +10,7 @@ from collections import deque
 import pdb
 import re, time
 
-import pyqtgdocktest_GUI as gui
+import pyNetAnnGui as gui
 
 
 Npts=2000
@@ -21,6 +21,7 @@ output_data = deque([],Npts)
 R_data = deque([],Npts)
 C_data = deque([],Npts)
 tax = deque([],Npts)
+fax = deque([],Npts)
 
 state = None
 
@@ -119,7 +120,7 @@ def sendCommand(cmdName, *args):
     if ardPort:
         ardPort.write(cmdString+'\n')
 
-def change(param, changes):
+def paramTreeChanged(param, changes):
     print("tree changes:")
     for param, changeType, newVal in changes:
         #path = p.childPath(param)
@@ -137,7 +138,7 @@ def change(param, changes):
         sendCommand(paramName)#, str(newVal)) 
 
 gui.parList.addChildren(contParams)
-gui.parList.sigTreeStateChanged.connect(change)
+gui.parList.sigTreeStateChanged.connect(paramTreeChanged)
 gui.paramTree.setParameters(gui.parList, showTop=False)
 
 r=re.compile('[: ,]+'); # Regex to match any sequence of colons, 
@@ -206,24 +207,20 @@ def updateResponsePlots(sampleTime, read0, read90, output):
     gui.read_curveR.setData(tax, read_dataR)
     gui.output_curve.setData(tax, output_data)
 
-def updateImpedancePlot(sampleTime, read0, read90, output):
-    global R_data, C_data,  R_curve, C_curve
+def updateSpectrumPlot(freq, sig0, sig90):
+    global read_data0F, read_data90F,  read_curve0F, read_curve90F
     #read0=sp.rand()
     #read90=sp.rand()
     #output=sp.rand()/2+0.4
-    read_data0.append(read0)
-    read_data90.append(read90)
-    read_dataR.append(sp.sqrt(read0**2+read90**2))
-    output_data.append(output)
+    read_data0F.append(read0)
+    read_data90F.append(read90)
 
     #tlast+=0.5+sp.rand()/5 
-    tax.append(sampleTime)
+    fax.append(freq)
     #tax.append(time.time()-tstart)
 
-    gui.read_curve0.setData(tax, read_data0)
-    gui.read_curve90.setData(tax, read_data90)
-    gui.read_curveR.setData(tax, read_dataR)
-    gui.output_curve.setData(tax, output_data)
+    gui.read_curve0F.setData(fax, read_data0)
+    gui.read_curve90F.setData(fax, read_data90)
 
 def updateSensWfm(dat):
     gui.sens_curve.setData(dat)

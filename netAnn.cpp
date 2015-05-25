@@ -202,18 +202,21 @@ QuadratureSample NetworkAnalyser::calibrateSample(QuadratureSample q, float freq
 	q=q.rotated(-freq*calWriteReadLag*TWOPI);
 	return q;
 }
-QuadratureSample NetworkAnalyser::freqSampleResult(){
-	while(!freqSampleDone()){
-		delay(5);
-	}
+
+QuadratureSample NetworkAnalyser::sample(){
 	int sig0_cum_temp;
 	int sig90_cum_temp;
 
 	sig0_cum_temp=ACQ_sig0_cum; // make temporaries (as the actual numbers could theoretically get
 	sig90_cum_temp=ACQ_sig90_cum;// updated while we're here)
 	int sample_count_temp=ACQ_sample_count;
+
 	ACQ_sig0_cum=0; //Reset the accumulated signal to zero
 	ACQ_sig90_cum=0;
+    ACQ_cycle_count=0;
+    ACQ_sample_count=0;
+    sig0_cum_temp=0;
+    sig90_cum_temp=0;
 
 	float sig0 = ((float)(sig0_cum_temp + sig0_long)/sample_count_temp);
 	float sig90 = ((float)(sig90_cum_temp + sig90_long)/sample_count_temp);
@@ -221,12 +224,16 @@ QuadratureSample NetworkAnalyser::freqSampleResult(){
 	sig0_long=0;
 	sig90_long=0;
 
-
 	return QuadratureSample(sig0, sig90); // Should maybe return a pair
+}
+QuadratureSample NetworkAnalyser::freqSampleResult(){
+	while(!freqSampleDone()){
+		delay(5);
+	}
+    return sample();
 }
 
 QuadratureSample NetworkAnalyser::freqSampleAndWait(float freq, float integration_time){
-	
 	if (integration_time==-1){
 		integration_time=this->integration_time;
 	}
@@ -551,6 +558,11 @@ unsigned int NetworkAnalyser::setSensAmplitudeDig(unsigned int amp){
 	return this->_sens_amplitude_dig;
 }
 
+unsigned int NetworkAnalyser::setSensAmplitudeDig2(unsigned int amp){
+	this->_sens_amplitude_dig2=amp;
+	updateSensWvfm2();
+	return this->_sens_amplitude_dig2;
+}
 int NetworkAnalyser::_setReadLagPts(int pts) {
 	this->_read_lag_pts=pts;
 	updateReadWvfms();
@@ -601,7 +613,6 @@ void NetworkAnalyser::updateSensWvfm(){
 	this->writeWaveForm(this->sens_wv_fm, cur_N_SENS_WV, nCycles, this->_sens_amplitude_dig,
 			this->_sens_phase, 
 			this->bRepeatPointsInWaveform ? this->nPointRepetitions : 1 );
-	//printSensWvfm();
 }
 #if FLAG_TWO_OUTPUTS
 void NetworkAnalyser::updateSensWvfm2(){
@@ -663,3 +674,5 @@ void NetworkAnalyser::printAcqParams(){
 	PRINT_VAR(ACQ_sig90_cum);
 	PRINT_VAR(ACQ_sample_count);
 }
+
+
